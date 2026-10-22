@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Scholar Track – Scholarship Management System
 
 A modern, responsive, and student-focused web application built with **Python (Flask)**, **SQLite3**, **HTML5**, **CSS3**, **JavaScript**, and **Bootstrap 5**.
@@ -214,3 +215,6 @@ To stop the server at any time, press **`Ctrl + C`** in the terminal.
 ## 7. License and Attribution
 
 Developed as a demonstration and student project for academic and personal scholarship tracking. Free to modify and adapt for college submissions and educational purposes.
+=======
+# Scholor-Track
+>>>>>>> 7cc34e7a8db3d5dda116af93843b3d3d2d0ec95f
