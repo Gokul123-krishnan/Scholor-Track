@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite Database (optional to ignore, included for convenience)
+*.sqlite3-journal
+*.db-journal
+
+# Operating System & IDE Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

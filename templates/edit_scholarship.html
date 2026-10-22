@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ scholarship.scholarship_name }} – Scholar Track{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('scholarships') }}" class="text-decoration-none">Scholarships</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('scholarship_details', scholarship_id=scholarship.id) }}" class="text-decoration-none">{{ scholarship.scholarship_name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold text-dark mb-1">Edit Scholarship Details</h1>
+    <p class="text-secondary mb-0">Update information, requirements, deadline, or application status.</p>
+  </div>
+  <a href="{{ url_for('scholarship_details', scholarship_id=scholarship.id) }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Back to Details
+  </a>
+</div>
+
+<!-- Edit Form Card -->
+<div class="row justify-content-center">
+  <div class="col-12 col-xl-10">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-md-5">
+        <form action="{{ url_for('edit_scholarship', scholarship_id=scholarship.id) }}" method="POST">
+          
+          <!-- Section 1: Basic Information -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
+              <i class="bi bi-info-circle me-2"></i>Basic Information
+            </h5>
+            <div class="row g-3">
+              <!-- Scholarship Name -->
+              <div class="col-12 col-md-7">
+                <label for="scholarship_name" class="form-label">Scholarship Name <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="scholarship_name"
+                  name="scholarship_name"
+                  value="{{ scholarship.scholarship_name }}"
+                  required
+                >
+              </div>
+
+              <!-- Provider -->
+              <div class="col-12 col-md-5">
+                <label for="provider" class="form-label">Provider / Organization <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="provider"
+                  name="provider"
+                  value="{{ scholarship.provider }}"
+                  required
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Financials & Timeline -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
+              <i class="bi bi-calendar-event me-2"></i>Financials &amp; Timeline
+            </h5>
+            <div class="row g-3">
+              <!-- Amount -->
+              <div class="col-12 col-md-4">
+                <label for="amount" class="form-label">Amount ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    class="form-control"
+                    id="amount"
+                    name="amount"
+                    value="{{ scholarship.amount }}"
+                  >
+                </div>
+              </div>
+
+              <!-- Deadline -->
+              <div class="col-12 col-md-4">
+                <label for="deadline" class="form-label">Deadline (YYYY-MM-DD) <span class="text-danger">*</span></label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="deadline"
+                  name="deadline"
+                  value="{{ scholarship.deadline }}"
+                  required
+                >
+              </div>
+
+              <!-- Application Status -->
+              <div class="col-12 col-md-4">
+                <label for="application_status" class="form-label">Application Status</label>
+                <select class="form-select" id="application_status" name="application_status">
+                  <option value="Pending" {% if scholarship.application_status == 'Pending' %}selected{% endif %}>Pending</option>
+                  <option value="Applied" {% if scholarship.application_status == 'Applied' %}selected{% endif %}>Applied</option>
+                  <option value="Approved" {% if scholarship.application_status == 'Approved' %}selected{% endif %}>Approved</option>
+                  <option value="Rejected" {% if scholarship.application_status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Eligibility & Description -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
+              <i class="bi bi-card-checklist me-2"></i>Eligibility &amp; Description
+            </h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="eligibility" class="form-label">Eligibility Criteria</label>
+                <textarea
+                  class="form-control"
+                  id="eligibility"
+                  name="eligibility"
+                  rows="3"
+                >{{ scholarship.eligibility }}</textarea>
+              </div>
+
+              <div class="col-12">
+                <label for="description" class="form-label">Scholarship Description</label>
+                <textarea
+                  class="form-control"
+                  id="description"
+                  name="description"
+                  rows="3"
+                >{{ scholarship.description }}</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Application Link -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">
+              <i class="bi bi-link-45deg me-2"></i>Application Link
+            </h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="application_link" class="form-label">Application Portal URL</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                  <input
+                    type="url"
+                    class="form-control"
+                    id="application_link"
+                    name="application_link"
+                    value="{{ scholarship.application_link }}"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteConfirmModal"
+              data-scholarship-id="{{ scholarship.id }}"
+              data-scholarship-name="{{ scholarship.scholarship_name }}"
+            >
+              <i class="bi bi-trash3 me-1"></i>Delete Scholarship
+            </button>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('scholarship_details', scholarship_id=scholarship.id) }}" class="btn btn-outline-secondary">
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check2-circle me-1"></i>Save Changes
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard – Scholar Track{% endblock %}
+
+{% block content %}
+<!-- Dashboard Welcome Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold text-dark mb-1">Scholarship Dashboard</h1>
+    <p class="text-secondary mb-0">
+      Track upcoming deadlines, monitor application statuses, and discover new funding opportunities in one place.
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('scholarships') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+      <i class="bi bi-list-ul"></i> View All
+    </a>
+    <a href="{{ url_for('add_scholarship') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+      <i class="bi bi-plus-circle"></i> Add Scholarship
+    </a>
+  </div>
+</div>
+
+{% if stats %}
+<!-- 1. Key Statistics Summary Cards -->
+<div class="row g-3 mb-4">
+  <!-- Card 1: Total Scholarships -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-primary h-100">
+      <div class="stat-card-body">
+        <div class="stat-card-title">Total Scholarships</div>
+        <div class="stat-card-value">{{ stats.total_scholarships }}</div>
+        <div class="stat-card-subtext">
+          <i class="bi bi-cash-stack text-primary me-1"></i>{{ stats.formatted_total_amount }} total pool
+        </div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="bi bi-mortarboard"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Upcoming / Active -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-success h-100">
+      <div class="stat-card-body">
+        <div class="stat-card-title">Active &amp; Upcoming</div>
+        <div class="stat-card-value text-success">{{ stats.upcoming_count }}</div>
+        <div class="stat-card-subtext text-success">
+          <i class="bi bi-calendar-check me-1"></i>Open for application
+        </div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="bi bi-clock-history"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Expiring Soon (<= 7 Days) -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-warning h-100">
+      <div class="stat-card-body">
+        <div class="stat-card-title">Expiring Soon (&le; 7d)</div>
+        <div class="stat-card-value text-warning">{{ stats.expiring_soon_count }}</div>
+        <div class="stat-card-subtext text-danger">
+          <i class="bi bi-alarm me-1"></i>Requires urgent attention
+        </div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="bi bi-hourglass-bottom"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Expired -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card stat-danger h-100">
+      <div class="stat-card-body">
+        <div class="stat-card-title">Expired Deadlines</div>
+        <div class="stat-card-value text-secondary">{{ stats.expired_count }}</div>
+        <div class="stat-card-subtext text-muted">
+          <i class="bi bi-archive me-1"></i>Past due date
+        </div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="bi bi-calendar-x"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Application Tracking Progress & Status Breakdown -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-lg-8">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <h5 class="card-title fw-bold text-dark mb-0 fs-6">
+          <i class="bi bi-bar-chart-steps text-primary me-2"></i>Application Status Breakdown
+        </h5>
+        <span class="badge bg-light text-secondary border">Real-time status</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 text-center">
+          <!-- Pending -->
+          <div class="col-6 col-md-3">
+            <div class="p-3 rounded bg-light border border-warning-subtle">
+              <div class="text-warning fs-3 mb-1"><i class="bi bi-hourglass-split"></i></div>
+              <div class="fw-bold fs-4 text-dark">{{ stats.status_counts.Pending }}</div>
+              <div class="text-secondary small fw-medium">Pending Review</div>
+            </div>
+          </div>
+          <!-- Applied -->
+          <div class="col-6 col-md-3">
+            <div class="p-3 rounded bg-light border border-info-subtle">
+              <div class="text-info fs-3 mb-1"><i class="bi bi-send-check"></i></div>
+              <div class="fw-bold fs-4 text-dark">{{ stats.status_counts.Applied }}</div>
+              <div class="text-secondary small fw-medium">Submitted / Applied</div>
+            </div>
+          </div>
+          <!-- Approved -->
+          <div class="col-6 col-md-3">
+            <div class="p-3 rounded bg-light border border-success-subtle">
+              <div class="text-success fs-3 mb-1"><i class="bi bi-check-circle"></i></div>
+              <div class="fw-bold fs-4 text-success">{{ stats.status_counts.Approved }}</div>
+              <div class="text-secondary small fw-medium">Awarded / Approved</div>
+            </div>
+          </div>
+          <!-- Rejected -->
+          <div class="col-6 col-md-3">
+            <div class="p-3 rounded bg-light border border-danger-subtle">
+              <div class="text-danger fs-3 mb-1"><i class="bi bi-x-circle"></i></div>
+              <div class="fw-bold fs-4 text-secondary">{{ stats.status_counts.Rejected }}</div>
+              <div class="text-secondary small fw-medium">Rejected / Closed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Multi-segment Progress Bar -->
+        {% if stats.total_scholarships > 0 %}
+          {% set pending_pct = (stats.status_counts.Pending / stats.total_scholarships * 100) | round(1) %}
+          {% set applied_pct = (stats.status_counts.Applied / stats.total_scholarships * 100) | round(1) %}
+          {% set approved_pct = (stats.status_counts.Approved / stats.total_scholarships * 100) | round(1) %}
+          {% set rejected_pct = (stats.status_counts.Rejected / stats.total_scholarships * 100) | round(1) %}
+          <div class="progress mt-4" style="height: 10px;" role="progressbar" aria-label="Status Distribution">
+            <div class="progress-bar bg-warning" style="width: {{ pending_pct }}%" title="Pending: {{ pending_pct }}%"></div>
+            <div class="progress-bar bg-info" style="width: {{ applied_pct }}%" title="Applied: {{ applied_pct }}%"></div>
+            <div class="progress-bar bg-success" style="width: {{ approved_pct }}%" title="Approved: {{ approved_pct }}%"></div>
+            <div class="progress-bar bg-danger" style="width: {{ rejected_pct }}%" title="Rejected: {{ rejected_pct }}%"></div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial summary badge card -->
+  <div class="col-12 col-lg-4">
+    <div class="card h-100 shadow-sm border-0 bg-primary text-white" style="background: linear-gradient(135deg, #3730a3, #4f46e5) !important;">
+      <div class="card-body p-4 d-flex flex-column justify-content-between">
+        <div>
+          <span class="badge bg-white text-primary px-2 py-1 mb-3 fw-bold">Funding Overview</span>
+          <h5 class="fw-bold mb-1">Approved Funding</h5>
+          <div class="display-6 fw-bold mb-2">{{ stats.formatted_approved_amount }}</div>
+          <p class="text-light opacity-75 small">
+            Total scholarships successfully approved and awarded so far. Keep applying to increase your financial support!
+          </p>
+        </div>
+        <div class="pt-3 border-top border-white border-opacity-25 d-flex justify-content-between align-items-center">
+          <span class="small opacity-75">Target: {{ stats.formatted_total_amount }}</span>
+          <a href="{{ url_for('scholarships', status='Approved') }}" class="btn btn-light btn-sm text-primary fw-semibold">
+            View Approved
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Urgent Deadlines & Recently Added (2 Columns) -->
+<div class="row g-4 mb-4">
+  <!-- Column 1: Approaching Deadlines -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <h5 class="card-title fw-bold text-dark mb-0 fs-6">
+          <i class="bi bi-fire text-danger me-2"></i>Upcoming &amp; Approaching Deadlines
+        </h5>
+        <a href="{{ url_for('scholarships', deadline_status='upcoming', sort='deadline_asc') }}" class="small text-primary text-decoration-none fw-semibold">
+          View All Active &rarr;
+        </a>
+      </div>
+      <div class="card-body p-0">
+        {% if stats.urgent_scholarships %}
+          <div class="list-group list-group-flush">
+            {% for s in stats.urgent_scholarships %}
+              <div class="list-group-item p-3 border-0 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="mt-1">
+                    <span class="badge {{ s.deadline_badge_class }} badge-deadline">
+                      <i class="bi bi-clock"></i> {{ s.deadline_badge_text }}
+                    </span>
+                  </div>
+                  <div>
+                    <a href="{{ url_for('scholarship_details', scholarship_id=s.id) }}" class="fw-bold text-dark text-decoration-none">
+                      {{ s.scholarship_name }}
+                    </a>
+                    <div class="text-secondary small">
+                      <i class="bi bi-building me-1"></i>{{ s.provider }} &bull;
+                      <span class="fw-semibold text-primary">{{ s.formatted_amount }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge-status {{ s.status_badge_class }}">
+                    <i class="bi {{ s.status_icon }}"></i> {{ s.application_status }}
+                  </span>
+                  <a href="{{ url_for('scholarship_details', scholarship_id=s.id) }}" class="btn btn-outline-secondary btn-sm" title="Details">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5 text-secondary">
+            <i class="bi bi-calendar2-check fs-1 text-muted d-block mb-2"></i>
+            <p class="mb-2">No active upcoming deadlines at the moment.</p>
+            <a href="{{ url_for('add_scholarship') }}" class="btn btn-primary btn-sm">Add New Scholarship</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Column 2: Recently Added Scholarships -->
+  <div class="col-12 col-lg-6">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <h5 class="card-title fw-bold text-dark mb-0 fs-6">
+          <i class="bi bi-clock-history text-primary me-2"></i>Recently Added Opportunities
+        </h5>
+        <a href="{{ url_for('scholarships', sort='newest') }}" class="small text-primary text-decoration-none fw-semibold">
+          Browse Directory &rarr;
+        </a>
+      </div>
+      <div class="card-body p-0">
+        {% if stats.recent_scholarships %}
+          <div class="list-group list-group-flush">
+            {% for s in stats.recent_scholarships %}
+              <div class="list-group-item p-3 border-0 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                  <a href="{{ url_for('scholarship_details', scholarship_id=s.id) }}" class="fw-bold text-dark text-decoration-none">
+                    {{ s.scholarship_name }}
+                  </a>
+                  <div class="text-secondary small">
+                    <i class="bi bi-building me-1"></i>{{ s.provider }} &bull;
+                    <span class="fw-semibold text-dark">{{ s.formatted_amount }}</span>
+                  </div>
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-calendar-event me-1"></i>Deadline: {{ s.formatted_deadline }}
+                  </div>
+                </div>
+                <div class="text-end">
+                  <div class="mb-1">
+                    <span class="badge-status {{ s.status_badge_class }}">
+                      <i class="bi {{ s.status_icon }}"></i> {{ s.application_status }}
+                    </span>
+                  </div>
+                  <a href="{{ url_for('scholarship_details', scholarship_id=s.id) }}" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-medium">
+                    View info &rarr;
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-5 text-secondary">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+            <p class="mb-2">No scholarships in the database yet.</p>
+            <a href="{{ url_for('add_scholarship') }}" class="btn btn-primary btn-sm">Add First Scholarship</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning">
+  <h5><i class="bi bi-exclamation-triangle me-2"></i>Dashboard data unavailable</h5>
+  <p>The dashboard statistics could not be loaded. Please ensure the SQLite database is initialized properly.</p>
+</div>
+{% endif %}
+{% endblock %}
